@@ -23,6 +23,8 @@ for i in indicatorcodes:
     for c in countrycodes:
         codestring = QUANDL_PREFIX + c + "_" + i
         codes.append(codestring)
-print codes
+
+
+## print codes
 
 ### All the codes haha
