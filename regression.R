@@ -1,10 +1,10 @@
 #Analysis
 
 ####Load the Data
-First_World_Resp <- read.csv('FirstWorldEmissionData.csv', header = TRUE, row.names = 1)
+First_World_Resp <- read.csv('FirstWorldEmissionData.csv', header = FALSE, row.names = 1)
 First_World_Abs_Explanatory <- read.csv('FirstWorldAbsoluteExplantoryData.csv', header = TRUE, row.names = 1)
 First_World_Rel_Explanatory <- read.csv('FirstWorldRelativeExplantoryData.csv', header = TRUE, row.names = 1)
-Third_World_Resp <- read.csv('ThirsdWorldEmissionData.csv', header = TRUE, row.names = 1)
+Third_World_Resp <- read.csv('ThirsdWorldEmissionData.csv', header = FALSE, row.names = 1)
 Third_World_Abs_Explanatory <- read.csv('ThirdWorldAbsoluteExplanatoryData.csv', header = TRUE, row.names = 1)
 Third_World_Rel_Explanatory <- read.csv('ThirdWorldRelativeExplanatoryData.csv', header = TRUE, row.names = 1)
 
