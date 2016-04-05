@@ -20,11 +20,11 @@ fw_abs <- First_World_Abs_Explanatory[1:y,]
 tw_rel <- Third_World_Rel_Explanatory[1:j,]
 tw_abs <- Third_World_Abs_Explanatory[1:j,]
 
-# augment the df's by the response sets
-fw_rel$emission <- First_World_Resp$V2
-fw_abs$emission <- First_World_Resp$V2
-tw_rel$emission <- Third_World_Resp$V2
-tw_abs$emission <- Third_World_Resp$V2
+# augment the df's by the response sets, convert emission data from kilotonens to gigatonnes
+fw_rel$emission <- First_World_Resp$V2/1000000
+fw_abs$emission <- First_World_Resp$V2/1000000
+tw_rel$emission <- Third_World_Resp$V2/1000000
+tw_abs$emission <- Third_World_Resp$V2/1000000
 
 attach(fw_abs) # remember to detach later, just makes using columns easier
 
