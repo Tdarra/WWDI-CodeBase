@@ -76,24 +76,61 @@ tw_rel$CO2_MANF <- NULL
 tw_rel$CO2_TRAN <- NULL
 tw_rel$CO2_OTHX <- NULL
 
+fw_abs <- fw_abs[rowSums(is.na(fw_abs)) < ncol(fw_abs)/10,]
+tw_abs <- tw_abs[rowSums(is.na(tw_abs)) < ncol(tw_abs)/10,]
+
+fw_rel <- fw_rel[rowSums(is.na(fw_rel)) < ncol(fw_rel)/10,]
+tw_rel <- tw_rel[rowSums(is.na(tw_rel)) < ncol(tw_rel)/10,]
+
+
+
 
 # Explorartory fits and variable selection
 attach(fw_abs)
 fw_abs_fit <- lm(formula = emission ~ ., data = fw_abs, na.action = na.omit) # all variable fit
 summary(fw_abs_fit)
+detach(fw_abs)
 
 library(leaps)
-temp_fit <- regsubsets(emission ~., data = fw_abs)
-summary(temp_fit)
+fw_abs_var_selection <- regsubsets(emission ~., data = fw_abs)
+summary(fw_abs_var_selection)
+tw_abs_var_selection <- regsubsets(emission ~., data = tw_abs)
+summary(tw_abs_var_selection)
+fw_rel_var_selection <- regsubsets(emission~.,data = fw_rel)
+summary(fw_rel_var_selection)
+tw_rel_var_selection <- regsubsets(emission ~., data = tw_rel)
+summary(tw_rel_var_selection)
+
+fw_abs_fit8 <- lm(emission ~ GHGO_KT_CE...Value + EN_URB_MCTY...Value + AGR_TRAC_NO...Value + AGR_TOTL_KN...Value + AGR_TOTL_CD...Value + AGR_TOTL_CN...Value + ADJ_DCO2_CD...Value + ADJ_DFOR_CD...Value, data = fw_abs)
+summary(fw_abs_fit8)
 
 fw_abs_fit3 <- lm(emission ~ AGR_TRAC_NO...Value + ADJ_DCO2_CD...Value + AGR_TOTL_KN...Value, data = fw_abs)
 summary(fw_abs_fit3)
 
-
 temp_fit2 <- lm(emission ~ AGR_TOTL_CD...Value + EN_URB_LCTY...Value + EN_URB_MCTY...Value, data = fw_abs)
 summary(temp_fit2)
+
+tw_abs_fit3 <- lm(emission ~ ADJ_DCO2_CD...Value + AGR_TOTL_CN...Value + EN_POP_DNST...Value, data = tw_abs)
+summary(tw_abs_fit3)
+
+
 
 detach(fw_abs)
 attach(fw_rel)
 fw_rel_fit <- lm(formula = emission ~ ., data = fw_rel, na.action = na.omit) # all variable fit
 summary(fw_rel_fit)
+detach(fw_rel)
+
+# checkout pairwise scatterplots
+pair_fw_rel <- pairs(fw_rel)
+pair_fw_abs <- pairs(fw_abs)
+pair_tw_rel <- pairs(tw_rel)
+pair_tw_abs <- pairs(tw_abs)
+
+# Look at correlation matrix to check for interaction terms
+cor_fw_rel <- cor(fw_rel)
+cor_tw_rel <- cor(tw_rel)
+cor_fw_abs <- cor(fw_abs)
+cor_tw_abs <- cor(tw_abs)
+
+# 
