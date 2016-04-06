@@ -1,5 +1,7 @@
 #Analysis
 
+library(forecast)
+
 ####Load the Data
 First_World_Resp <- read.csv('FirstWorldEmissionData.csv', header = FALSE, row.names = 1)
 First_World_Abs_Explanatory <- read.csv('FirstWorldAbsoluteExplantoryData.csv', header = TRUE, row.names = 1)
@@ -76,6 +78,29 @@ tw_rel$CO2_MANF <- NULL
 tw_rel$CO2_TRAN <- NULL
 tw_rel$CO2_OTHX <- NULL
 
+fw_abs <- fw_abs[rowSums(is.na(fw_abs)) < ncol(fw_abs)/10,]
+tw_abs <- tw_abs[rowSums(is.na(tw_abs)) < ncol(tw_abs)/10,]
+
+fw_rel <- fw_rel[rowSums(is.na(fw_rel)) < ncol(fw_rel)/10,]
+tw_rel <- tw_rel[rowSums(is.na(tw_rel)) < ncol(tw_rel)/10,]
+
+# get lengths for training and holdout data sets
+# assign most recent 10 years (ie. last in the data) to the holdout
+
+fw_rel_training_length <- length(fw_rel$emission) - 10
+fw_abs_training_length <- length(fw_abs$emission) - 10
+tw_rel_training_length <- length(tw_rel$emission) - 10
+tw_abs_training_length <- length(tw_abs$emission) - 10
+
+# split data into training and holdout sets
+fw_rel_train <- fw_rel[1:fw_rel_training_length,]
+fw_rel_holdout <- tail(fw_rel, n = 10)
+fw_abs_train <- fw_abs[1:fw_abs_training_length,]
+fw_abs_holdout <- tail(fw_abs, n = 10)
+tw_rel_train <- tw_rel[1:tw_rel_training_length,]
+tw_rel_holdout <- tail(tw_rel, n = 10)
+tw_abs_train <- tw_abs[1:tw_abs_training_length,]
+tw_abs_holdout <- tail(tw_abs, n = 10)
 
 # Explorartory fits and variable selection
 attach(fw_abs)
@@ -97,3 +122,6 @@ detach(fw_abs)
 attach(fw_rel)
 fw_rel_fit <- lm(formula = emission ~ ., data = fw_rel, na.action = na.omit) # all variable fit
 summary(fw_rel_fit)
+
+fc_fw_abs_fit3 <- predict.lm(fw_abs_fit3, fw_abs_train, n.ahead = 10, level = c(90, 95, 99, 99.9))
+fc_fw_abs_fit3
