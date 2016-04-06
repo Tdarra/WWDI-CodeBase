@@ -86,6 +86,9 @@ library(leaps)
 temp_fit <- regsubsets(emission ~., data = fw_abs)
 summary(temp_fit)
 
+fw_abs_fit3 <- lm(emission ~ AGR_TRAC_NO...Value + ADJ_DCO2_CD...Value + AGR_TOTL_KN...Value, data = fw_abs)
+summary(fw_abs_fit3)
+
 
 temp_fit2 <- lm(emission ~ AGR_TOTL_CD...Value + EN_URB_LCTY...Value + EN_URB_MCTY...Value, data = fw_abs)
 summary(temp_fit2)
