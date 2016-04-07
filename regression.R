@@ -255,7 +255,7 @@ tw_rel_fit5_cvrmse <- ls.cvrmse(tw_rel_fit5)
 print(c(tw_rel_fit_cvrmse, tw_rel_fit5_cvrmse))
 
 #5-fold validation
-#fw_abs
+#fw_abs best-3var
 n <- nrow(fw_abs)
 sn <- floor(n/5)
 set.seed(306)
@@ -281,7 +281,33 @@ for (i in 1:B)
 
 apply(na.omit(errMx), 2, mean) 
 
-#tw_abs
+#fw_abs 8var
+n <- nrow(fw_abs)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- fw_abs[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- fw_abs[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = fw_abs, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~ GHGO_KT_CE...Value + EN_URB_MCTY...Value + AGR_TRAC_NO...Value + AGR_TOTL_KN...Value + AGR_TOTL_CD...Value + AGR_TOTL_CN...Value + ADJ_DCO2_CD...Value + ADJ_DFOR_CD...Value, data = fw_abs)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
+
+#tw_abs best-6var
 n <- nrow(tw_abs)
 sn <- floor(n/5)
 set.seed(306)
@@ -307,7 +333,33 @@ for (i in 1:B)
 
 apply(na.omit(errMx), 2, mean) 
 
-#fw_rel
+#tw_abs 7var
+n <- nrow(tw_abs)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- tw_abs[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- tw_abs[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = tw_abs, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- tw_abs_fit7 <- lm(emission ~ ADJ_DCO2_CD...Value + AGR_TOTL_CN...Value + AGR_TOTL_KD...Value + AGR_TOTL_KN...Value + EN_POP_DNST...Value + EN_URB_LCTY...Value + EN_URB_MCTY...Value , data = tw_abs)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
+
+#fw_rel best-4var
 n <- nrow(fw_rel)
 sn <- floor(n/5)
 set.seed(306)
@@ -333,7 +385,33 @@ for (i in 1:B)
 
 apply(na.omit(errMx), 2, mean) 
 
-#tw_rel
+#fw_rel 2var test
+n <- nrow(fw_rel)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- fw_rel[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- fw_rel[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = fw_rel, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~ EMPL_FE+LCTY_UR, data = fw_rel)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
+
+#tw_rel best-5var
 n <- nrow(tw_rel)
 sn <- floor(n/5)
 set.seed(306)
@@ -359,3 +437,28 @@ for (i in 1:B)
 
 apply(na.omit(errMx), 2, mean) 
 
+#tw_rel 6var
+n <- nrow(tw_rel)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- tw_rel[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- tw_rel[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = tw_rel, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~ AGR_TOTL+DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
