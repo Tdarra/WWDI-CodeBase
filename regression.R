@@ -203,4 +203,207 @@ best_fw_rel_model_cp_b <- which.min(fw_rel_ss_b$cp)#4
 best_tw_rel_model_r_b <- which.max(tw_rel_ss_b$adjr2)#5
 best_tw_rel_model_cp_b <- which.min(tw_rel_ss_b$cp)#5
 
+#VARIANCE INFLATION FACTOR
+fw_abs_fit_allvars <- lm(formula = emission ~ ., data = fw_abs)
+tw_abs_fit_allvars <- lm(formula = emission ~ ., data = tw_abs)
+fw_rel_fit_allvars <- lm(formula = emission ~ ., data = fw_rel)
+tw_rel_fit_allvars <- lm(formula = emission ~ ., data = tw_rel)
+head(fw_rel)
+head(tw_rel)
+fw_abs_fit1 <- lm(formula = emission ~ EN_URB_LCTY...Value, data = tw_abs)
+tw_abs_fit1 <- lm(formula = emission ~ EN_POP_DNST...Value, data = tw_abs)
+fw_rel_fit1 <- lm(formula = emission ~ EMPL_FE, data = fw_rel)
+tw_rel_fit1 <- lm(formula = emission ~ DFOR_GN, data = tw_rel)
+#SE value
+fw_abs_s<-summary(fw_abs_fit_allvars) #0.1794
+fw_abs_s1<-summary(fw_abs_fit1) #0.002056
+tw_abs_s<-summary(tw_abs_fit_allvars) #0.00192
+tw_abs_s1<-summary(tw_abs_fit1) #0.002033
+fw_rel_s<-summary(fw_rel_fit_allvars) #0.169
+fw_rel_s1<-summary(fw_rel_fit1) #0.216
+tw_rel_s<-summary(tw_rel_fit_allvars) #0.002942
+tw_rel_s1<-summary(tw_rel_fit1) #0.007082
+
+#VIF fw_abs
+fw_abs_c <- fw_abs[,-8]
+fw_abs_regffvsothers <- lm(EN_URB_LCTY...Value~., data=fw_abs_c)
+fw_abs_regffvsothers.summ <- summary(fw_abs_regffvsothers)
+1/(1-fw_abs_regffvsothers.summ$adj.r.squared)
+#VIF tw_abs
+head(tw_abs)
+tw_abs_c <- tw_abs[,-8]
+tw_abs_regffvsothers <- lm(EN_POP_DNST...Value~., data=tw_abs_c)
+tw_abs_regffvsothers.summ <- summary(tw_abs_regffvsothers)
+1/(1-tw_abs_regffvsothers.summ$adj.r.squared)
+#VIF fw_rel
+fw_rel_c <- fw_rel[,-11]
+fw_rel_regffvsothers <- lm(EMPL_FE~., data=fw_rel_c)
+fw_rel_regffvsothers.summ <- summary(fw_rel_regffvsothers)
+1/(1-fw_rel_regffvsothers.summ$adj.r.squared)
+#VIF tw_rel
+tw_rel_c <- tw_rel[,-8]
+tw_rel_regffvsothers <- lm(DFOR_GN~., data=tw_rel_c)
+tw_rel_regffvsothers.summ <- summary(tw_rel_regffvsothers)
+1/(1-tw_rel_regffvsothers.summ$adj.r.squared)
+
+#CROSS-VALIDATION
+ls.cvrmse <- function(ls.out)
+{
+  res.cv <- ls.out$residuals / (1.0 - ls.diag(ls.out)$hat)
+  # Identify NA's and remove them.
+  is.na.res <- is.na(res.cv)
+  res.cv <- res.cv[!is.na.res]
+  cvrmse <- sqrt(sum(res.cv^2) / length(res.cv))
+  return(cvrmse)
+}
+
+
+#exaustive models
+fw_abs_fit3 <- lm(emission ~ AGR_TOTL_KD...Value+AGR_TRAC_NO...Value + EN_URB_MCTY...Value, data = fw_abs)
+tw_abs_fit4 <- lm(emission ~  AGR_TRAC_NO...Value + EN_POP_DNST...Value + EN_URB_LCTY...Value + GHGO_KT_CE...Value , data = tw_abs)
+tw_abs_fit2 <- lm(emission ~  AGR_TRAC_NO...Value + EN_URB_LCTY...Value, data = tw_abs)
+fw_rel_fit4 <- lm(emission ~ AGR_TOTL+EMPL_FE+FRST_RT+LCTY_UR, data = fw_rel)
+tw_rel_fit5 <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel)
+
+#forward models
+fw_abs_fit4f <- lm(emission ~ AGR_TOTL_KD...Value+AGR_TRAC_NO...Value + EN_URB_LCTY...Value + EN_URB_MCTY...Value, data = fw_abs)
+tw_abs_fit4 <- lm(emission ~  AGR_TRAC_NO...Value + EN_POP_DNST...Value + EN_URB_LCTY...Value + GHGO_KT_CE...Value , data = tw_abs)
+tw_abs_fit2f <- lm(emission ~  AGR_TRAC_NO...Value + EN_POP_DNST...Value, data = tw_abs)
+fw_rel_fit4 <- lm(emission ~ AGR_TOTL+EMPL_FE+FRST_RT+LCTY_UR, data = fw_rel)
+tw_rel_fit5 <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel)
+
+#backward models
+fw_abs_fit3 <- lm(emission ~ AGR_TOTL_KD...Value+AGR_TRAC_NO...Value + EN_URB_MCTY...Value, data = fw_abs)
+tw_abs_fit4 <- lm(emission ~  AGR_TRAC_NO...Value + EN_POP_DNST...Value + EN_URB_LCTY...Value + GHGO_KT_CE...Value , data = tw_abs)
+tw_abs_fit2 <- lm(emission ~  AGR_TRAC_NO...Value + EN_URB_LCTY...Value, data = tw_abs)
+fw_rel_fit4b <- lm(emission ~ AGR_TOTL+EMPL_FE+LCTY_UR+MCTY_TL, data = fw_rel)
+tw_rel_fit5 <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel)
+
+#Leave one-out cross validation
+fw_abs_fit_cvrmse <- ls.cvrmse(fw_abs_fit_allvars)
+fw_abs_fit3_cvrmse <- ls.cvrmse(fw_abs_fit3)
+fw_abs_fit4_cvrmse<-ls.cvrmse(fw_abs_fit4f)
+print(c(fw_abs_fit_cvrmse, fw_abs_fit3_cvrmse))
+print(c(fw_abs_fit_cvrmse, fw_abs_fit4_cvrmse))
+
+tw_abs_fit_cvrmse <- ls.cvrmse(tw_abs_fit_allvars)
+tw_abs_fit4_cvrmse <- ls.cvrmse(tw_abs_fit4)
+print(c(tw_abs_fit_cvrmse, tw_abs_fit4_cvrmse))
+tw_abs_fit2_cvrmse <- ls.cvrmse(tw_abs_fit2)
+print(c(tw_abs_fit_cvrmse, tw_abs_fit2_cvrmse))
+
+fw_rel_fit_cvrmse <- ls.cvrmse(fw_rel_fit_allvars)
+fw_rel_fit4_cvrmse <- ls.cvrmse(fw_rel_fit4)
+fw_rel_fit4b_cvrmse<- ls.cvrmse(fw_rel_fit4b)
+print(c(fw_rel_fit_cvrmse, fw_rel_fit4_cvrmse))
+print(c(fw_rel_fit_cvrmse, fw_rel_fit4b_cvrmse))
+
+tw_rel_fit_cvrmse <- ls.cvrmse(tw_rel_fit_allvars)
+tw_rel_fit5_cvrmse <- ls.cvrmse(tw_rel_fit5)
+print(c(tw_rel_fit_cvrmse, tw_rel_fit5_cvrmse))
+
+#five-fold Cross Validation
+#fw_abs best-3var 
+n <- nrow(fw_abs)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- fw_abs[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- fw_abs[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = fw_abs, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~ AGR_TOTL_KD...Value+AGR_TRAC_NO...Value + EN_URB_MCTY...Value, data = fw_abs)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
+
+#tw_abs best-2var
+n <- nrow(tw_abs)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- tw_abs[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- tw_abs[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = tw_abs, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~  AGR_TRAC_NO...Value + EN_URB_LCTY...Value, data = tw_abs)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
+
+#fw_rel best-4var
+n <- nrow(fw_rel)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- fw_rel[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- fw_rel[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = fw_rel, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~ AGR_TOTL+EMPL_FE+FRST_RT+LCTY_UR, data = fw_rel)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean)
+
+#tw_rel best-5var
+n <- nrow(tw_rel)
+sn <- floor(n/5)
+set.seed(306)
+B <- 500 #Do 500 random splits
+errMx <- matrix(NA, B, 2) #matrix to store the results
+colnames(errMx) <- c("FullModel", "BestModel")
+for (i in 1:B)
+{
+  testInd <- sample(1:n, sn, replace=FALSE)
+  
+  tTestDat <- tw_rel[testInd, ] #Treat the sampled index as testing set
+  tTrainDat <- tw_rel[-testInd, ] #The rest is training set.
+  
+  tFullModel <- lm(formula = emission ~ ., data = tw_rel, na.action=na.omit)
+  tFullModel.pred <- predict(tFullModel, tTestDat)
+  errMx[i, 1] <- sqrt(sum((tTestDat$emission - tFullModel.pred)^2)/sn)
+  
+  
+  tBestModel <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel)
+  tBestModel.pred <- predict(tBestModel, tTestDat)
+  errMx[i, 2] <- sqrt(sum((tTestDat$emission - tBestModel.pred)^2)/sn)
+}
+
+apply(na.omit(errMx), 2, mean) 
 
