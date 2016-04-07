@@ -85,10 +85,6 @@ pair_tw_abs <- pairs(tw_abs)
 cor_fw_rel <- cor(fw_rel)
 cor_tw_rel <- cor(tw_rel)
 cor_fw_abs <- cor(fw_abs)
-fw_abs$ADJ_DCO2_CD...Value <- NULL
-fw_abs$AGR_TOTL_CD...Value <- NULL
-fw_abs$AGR_TOTL_CN...Value <- NULL
-fw_abs$AGR_TOTL_KN...Value <- NULL
 cor_fw_abs1 <- cor(fw_abs)
 
 cor_tw_abs <- cor(tw_abs)
