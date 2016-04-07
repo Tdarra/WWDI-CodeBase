@@ -91,6 +91,20 @@ tw$AGR_TOTL_CN...Value <- NULL
 tw$AGR_TOTL_KD...Value <- NULL
 tw$AGR_TOTL_KN...Value <- NULL
 
+# delete a few other columns that are not contributing
+
+fw$ADJ_DCO2_CD...Value <- NULL
+fw$DCO2_GN <- NULL
+fw$ADJ_DFOR_CD...Value <- NULL
+fw$EN_URB_LCTY...Value <- NULL
+fw$EN_URB_MCTY...Value <- NULL
+
+tw$ADJ_DCO2_CD...Value <- NULL
+tw$DCO2_GN <- NULL
+tw$ADJ_DFOR_CD...Value <- NULL
+tw$EN_URB_LCTY...Value <- NULL
+tw$EN_URB_MCTY...Value <- NULL
+
 fw <- fw[rowSums(is.na(fw)) < ncol(fw)/10,]
 tw <- tw[rowSums(is.na(tw)) < ncol(tw)/10,]
 
@@ -116,7 +130,7 @@ tw_training_length <- length(tw$emission) - 10
 # split data into training and holdout sets
 fw_rel_train <- fw_rel[1:fw_rel_training_length,]
 fw_rel_holdout <- tail(fw_rel, n = 10)
-fw_abs_train <- fw_abs[1:fw_abs_training_length,]
+fw_train <- fw_abs[1:fw_abs_training_length,]
 fw_abs_holdout <- tail(fw_abs, n = 10)
 tw_rel_train <- tw_rel[1:tw_rel_training_length,]
 tw_rel_holdout <- tail(tw_rel, n = 10)
@@ -132,20 +146,47 @@ detach(fw)
 library(leaps)
 fw_var_selection <- regsubsets(emission ~., data = fw)
 summary(fw_var_selection)
-tw_abs_var_selection <- regsubsets(emission ~., data = tw_abs)
-summary(tw_abs_var_selection)
+tw_var_selection <- regsubsets(emission ~., data = tw)
+summary(tw_var_selection)
 
-fw_abs_fit8 <- lm(emission ~ GHGO_KT_CE...Value + EN_URB_MCTY...Value + AGR_TRAC_NO...Value + AGR_TOTL_KN...Value + AGR_TOTL_CD...Value + AGR_TOTL_CN...Value + ADJ_DCO2_CD...Value + ADJ_DFOR_CD...Value, data = fw_abs)
-summary(fw_abs_fit8)
+fw_fit1 <- lm(emission ~ EMPL_FE, data = fw)
+fw_fit2 <- lm(emission ~ EMPL_MA + MCTY_TL, data = fw)
+fw_fit3 <- lm(emission ~ EN_POP_DNST...Value + LCTY_UR + MCTY_TL, data = fw)
 
-fw_abs_fit3 <- lm(emission ~ AGR_TRAC_NO...Value + ADJ_DCO2_CD...Value + AGR_TOTL_KN...Value, data = fw_abs)
-summary(fw_abs_fit3)
+# try running forward, backward, and exhaustive search for best variable subsets
 
-temp_fit2 <- lm(emission ~ AGR_TOTL_CD...Value + EN_URB_LCTY...Value + EN_URB_MCTY...Value, data = fw_abs)
-summary(temp_fit2)
+fw_var_selection <- regsubsets(emission ~., data = fw)
+fw_ss<-summary(fw_var_selection)
+tw_var_selection <- regsubsets(emission ~., data = tw)
+tw_ss<-summary(tw_var_selection)
 
-tw_abs_fit3 <- lm(emission ~ ADJ_DCO2_CD...Value + AGR_TOTL_CN...Value + EN_POP_DNST...Value, data = tw_abs)
-summary(tw_abs_fit3)
+fw_var_selection_f <- regsubsets(emission ~., data = fw, method = "forward")
+fw_ss_f<-summary(fw_var_selection_f)
+tw_var_selection_f <- regsubsets(emission ~., data = tw, method = "forward")
+tw_ss_f<-summary(tw_var_selection_f)
+
+fw_var_selection_b <- regsubsets(emission ~., data = fw, method = "backward")
+fw_ss_b<-summary(fw_var_selection_b)
+tw_var_selection_b <- regsubsets(emission ~., data = tw, method = "backward")
+tw_ss_b<-summary(tw_var_selection_b)
+
+#best exhaustive models
+best_fw_model_r <- which.max(fw_ss$adjr2)   #8
+best_fw_model_cp <- which.min(fw_ss$cp)     #6
+best_tw_model_r <- which.max(tw_ss$adjr2)   #8
+best_tw_model_cp <- which.min(tw_ss$cp)     #6
+
+#best forward models
+best_fw_model_r_f <- which.max(fw_ss_f$adjr2) #8
+best_fw_model_cp_f <- which.min(fw_ss_f$cp)   #8
+best_tw_model_r_f <- which.max(tw_ss_f$adjr2) #8
+best_tw_model_cp_f <- which.min(tw_ss_f$cp)   #6
+
+#best backward models
+best_fw_model_r_b <- which.max(fw_ss_b$adjr2) #8
+best_fw_model_cp_b <- which.min(fw_ss_b$cp)   #6
+best_tw_model_r_b <- which.max(tw_ss_b$adjr2) #8
+best_tw_model_cp_b <- which.min(tw_ss_b$cp)   #6
 
 
 
