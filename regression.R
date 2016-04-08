@@ -304,6 +304,7 @@ print(c(tw_rel_fit_cvrmse, tw_rel_fit5_cvrmse))
 
 # forecasts based on best 4 models from leave-one-out cross-validation
 library(forecast)
+library(hydroGOF)
 bestModels = c(fw_abs_fit3, tw_abs_fit2, fw_rel_fit4, tw_rel_fit5)
 
 # exclude last 10 years for training sets
@@ -325,8 +326,15 @@ train_tw_abs_fit2 <- lm(emission ~  AGR_TRAC_NO...Value + EN_URB_LCTY...Value, d
 train_fw_rel_fit4 <- lm(emission ~ AGR_TOTL+EMPL_FE+FRST_RT+LCTY_UR, data = fw_rel_train)
 train_tw_rel_fit5 <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel_train)
 
-predict(train_fw_abs_fit3, newdata = fw_abs_test)
 fw_abs_forecast <- forecast(train_fw_abs_fit3, newdata = fw_abs_test, level = 95, robust = TRUE)
+fw_rel_forecast <- forecast(train_fw_rel_fit4, newdata = fw_rel_test, level = 95, robust = TRUE)
+tw_abs_forecast <- forecast(train_tw_abs_fit2, newdata = tw_abs_test, level = 95, robust = TRUE)
+tw_rel_forecast <- forecast(train_tw_rel_fit5, newdata = tw_rel_test, level = 95, robust = TRUE)
+
+mse(fw_abs_forecast$mean, fw_abs_test$emission)
+mse(fw_rel_forecast$mean, fw_rel_test$emission)
+mse(tw_abs_forecast$mean, tw_abs_test$emission)
+mse(tw_rel_forecast$mean, tw_rel_test$emission)
 
 #five-fold Cross Validation
 #fw_abs best-3var 
