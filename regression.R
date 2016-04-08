@@ -142,12 +142,16 @@ tw_abs_fit_allvars <- lm(formula = emission ~ ., data = tw_abs)
 fw_rel_fit_allvars <- lm(formula = emission ~ ., data = fw_rel)
 tw_rel_fit_allvars <- lm(formula = emission ~ ., data = tw_rel)
 
-#Residual Plots
+#Residual Plots and transforms
 plot(fw_abs_fit_allvars)
 plot(tw_abs_fit_allvars)
 plot(fw_rel_fit_allvars)
 plot(tw_rel_fit_allvars)
-
+attach(tw_abs)
+tw_abs_fit_log_4 <- lm(log(emission) ~ log(AGR_TRAC_NO...Value) + log(EN_POP_DNST...Value))
+plot(tw_abs_fit_log_4)
+detach(tw_abs)
+fw_rel_fit_log <- lm(log(emission) ~ log(AGR_TOTL)+log(EMPL_FE)+log(FRST_RT)+log(LCTY_UR), data = fw_rel)
 fw_abs_var_selection <- regsubsets(emission ~., data = fw_abs)
 fw_abs_ss<-summary(fw_abs_var_selection)
 tw_abs_var_selection <- regsubsets(emission ~., data = tw_abs)
