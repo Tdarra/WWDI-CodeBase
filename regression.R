@@ -281,26 +281,52 @@ tw_rel_fit5 <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_
 
 #Leave one-out cross validation
 fw_abs_fit_cvrmse <- ls.cvrmse(fw_abs_fit_allvars)
-fw_abs_fit3_cvrmse <- ls.cvrmse(fw_abs_fit3)
-fw_abs_fit4_cvrmse<-ls.cvrmse(fw_abs_fit4f)
+fw_abs_fit3_cvrmse <- ls.cvrmse(fw_abs_fit3)  # best model fw_abs_fit3
+fw_abs_fit4_cvrmse <-ls.cvrmse(fw_abs_fit4f)
 print(c(fw_abs_fit_cvrmse, fw_abs_fit3_cvrmse))
 print(c(fw_abs_fit_cvrmse, fw_abs_fit4_cvrmse))
 
 tw_abs_fit_cvrmse <- ls.cvrmse(tw_abs_fit_allvars)
 tw_abs_fit4_cvrmse <- ls.cvrmse(tw_abs_fit4)
 print(c(tw_abs_fit_cvrmse, tw_abs_fit4_cvrmse))
-tw_abs_fit2_cvrmse <- ls.cvrmse(tw_abs_fit2)
+tw_abs_fit2_cvrmse <- ls.cvrmse(tw_abs_fit2)  # best model tw_abs_fit2
 print(c(tw_abs_fit_cvrmse, tw_abs_fit2_cvrmse))
 
 fw_rel_fit_cvrmse <- ls.cvrmse(fw_rel_fit_allvars)
-fw_rel_fit4_cvrmse <- ls.cvrmse(fw_rel_fit4)
+fw_rel_fit4_cvrmse <- ls.cvrmse(fw_rel_fit4)  # best model fw_rel_fit4
 fw_rel_fit4b_cvrmse<- ls.cvrmse(fw_rel_fit4b)
 print(c(fw_rel_fit_cvrmse, fw_rel_fit4_cvrmse))
 print(c(fw_rel_fit_cvrmse, fw_rel_fit4b_cvrmse))
 
 tw_rel_fit_cvrmse <- ls.cvrmse(tw_rel_fit_allvars)
-tw_rel_fit5_cvrmse <- ls.cvrmse(tw_rel_fit5)
+tw_rel_fit5_cvrmse <- ls.cvrmse(tw_rel_fit5)  # best model tw_rel_fit5
 print(c(tw_rel_fit_cvrmse, tw_rel_fit5_cvrmse))
+
+# forecasts based on best 4 models from leave-one-out cross-validation
+library(forecast)
+bestModels = c(fw_abs_fit3, tw_abs_fit2, fw_rel_fit4, tw_rel_fit5)
+
+# exclude last 10 years for training sets
+
+fw_abs_train <- fw_abs[1:(nrow(fw_abs) - 10),]
+fw_rel_train <- fw_rel[1:(nrow(fw_rel) - 10),]
+tw_abs_train <- tw_abs[1:(nrow(tw_abs) - 10),]
+tw_rel_train <- tw_rel[1:(nrow(tw_rel) - 10),]
+
+# get new data (the test data) for each of the sets
+fw_abs_test <- tail(fw_abs, n = 10)
+fw_rel_test <- tail(fw_rel, n = 10)
+tw_abs_test <- tail(tw_abs, n = 10)
+tw_rel_test <- tail(tw_rel, n = 10)
+
+# train models
+train_fw_abs_fit3 <- lm(emission ~ AGR_TOTL_KD...Value+AGR_TRAC_NO...Value + EN_URB_MCTY...Value, data = fw_abs_train)
+train_tw_abs_fit2 <- lm(emission ~  AGR_TRAC_NO...Value + EN_URB_LCTY...Value, data = tw_abs_train)
+train_fw_rel_fit4 <- lm(emission ~ AGR_TOTL+EMPL_FE+FRST_RT+LCTY_UR, data = fw_rel_train)
+train_tw_rel_fit5 <- lm(emission ~ DCO2_GN+DFOR_GN+FRST_RT+LCTY_UR+MCTY_TL, data = tw_rel_train)
+
+predict(train_fw_abs_fit3, newdata = fw_abs_test)
+fw_abs_forecast <- forecast(train_fw_abs_fit3, newdata = fw_abs_test, level = 95, robust = TRUE)
 
 #five-fold Cross Validation
 #fw_abs best-3var 
