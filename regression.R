@@ -130,9 +130,6 @@ tw_rel_var_selection <- regsubsets(emission ~., data = tw_rel)
 summary(tw_rel_var_selection)
 
 
-
-
-
 detach(fw_abs)
 attach(fw_rel)
 fw_rel_fit <- lm(formula = emission ~ ., data = fw_rel, na.action = na.omit) # all variable fit
@@ -145,6 +142,11 @@ tw_abs_fit_allvars <- lm(formula = emission ~ ., data = tw_abs)
 fw_rel_fit_allvars <- lm(formula = emission ~ ., data = fw_rel)
 tw_rel_fit_allvars <- lm(formula = emission ~ ., data = tw_rel)
 
+#Residual Plots
+plot(fw_abs_fit_allvars)
+plot(tw_abs_fit_allvars)
+plot(fw_rel_fit_allvars)
+plot(tw_rel_fit_allvars)
 
 fw_abs_var_selection <- regsubsets(emission ~., data = fw_abs)
 fw_abs_ss<-summary(fw_abs_var_selection)
